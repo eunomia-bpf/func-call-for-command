@@ -1,0 +1,7 @@
+Flask==2.2.2
+langchain==0.0.220
+marko==2.0.0
+prompt_toolkit==3.0.36
+Pygments==2.14.0
+Pygments==2.11.2
+pygments_markdown_lexer==0.1.0.dev39
