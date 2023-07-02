@@ -6,7 +6,7 @@ A function call generator for terminal commands, where the user provides the hel
 
 Firstly, you need to clone this repo and install the necessary python package:
 ```
-git clone 
+git clone https://github.com/eunomia-bpf/func-call-for-command.git
 pip install -r requirements.txt
 ```
 Then, use command line interaction to generate function calls and JSON descriptions. You can provide command name such as `python ./main.py -k you_openai_api_key -c uname`. When using this method, make sure you have the relevant commands installed.
