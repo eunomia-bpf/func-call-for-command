@@ -1,6 +1,6 @@
 # GPT Func Call generator for Command-line
 
-** Your one-click solution to transform traditional command-line tools into natural language-driven powerhouses! **
+**Your one-click solution to transform traditional command-line tools into natural language-driven powerhouses!**
 
 Ever wondered if your command-line tools could understand plain English? We did too, so we built **Naturaliser**. Built on the bedrock of OpenAI's GPT technology, **Naturaliser** turns your dense, jargon-filled help files into sleek, interactive commands that anyone can understand and execute.
 
@@ -34,7 +34,7 @@ Then, use command line interaction to generate function calls and JSON descripti
 There is an example about this tools:
 
 ```console
-$python ./main.py -k you_openai_api_key -c ugc
+$python ./main.py -k you_openai_api_key -c uname
 ```
 During this process, GPT returns a JSON description of the command, like the following:
 ```json
@@ -62,7 +62,7 @@ During this process, GPT returns a JSON description of the command, like the fol
     }
 }
 ```
-This will generate a `ugc-gpt.sh` file, and then you can use the ugc command in a much easier way, like the following:
+This will generate a `uname-gpt.sh` file, and then you can use the uname command in a much easier way, like the following:
 ```console
 $bash ./uname-gpt.sh print the kernel information
 Run: uname --kernel-name  --kernel-release  --kernel-version 

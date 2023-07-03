@@ -71,5 +71,5 @@ for key in $(echo "$args" | jq -r 'keys[]'); do
     fi
 done
 
-echo "Run $full_command"
+echo "Run: $full_command"
 eval "$full_command"
