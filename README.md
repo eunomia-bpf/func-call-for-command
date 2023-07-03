@@ -35,66 +35,38 @@ There is an example about this tools:
 
 ```console
 $python ./main.py -k you_openai_api_key -c ugc
-
-The response from ChatGPT:
-
-Here is a Python function to execute the "ugc" command according to the provided help docs:
-
-import subprocess
-
-def execute_ugc_command(pid, language=None, verbose=False, milliseconds=False, minimum=None, filter=None):
-    command = ['./ugc', str(pid)]
-    if language:
-        command.extend(['-l', language])
-    if verbose:
-        command.append('-v')
-    if milliseconds:
-        command.append('-m')
-    if minimum:
-        command.extend(['-M', str(minimum)])
-    if filter:
-        command.extend(['-F', filter])
-    
-    result = subprocess.run(command, capture_output=True, text=True)
-    return result.stdout
-
-
-And here is the JSON code to describe this command function:
-
-
-[{
-    "name": "execute_ugc_command",
-    "description": "Execute the ugc command",
+```
+During this process, GPT returns a JSON description of the command, like the following:
+```json
+{
+    "name": "uname",
+    "description": "Print certain system information",
     "parameters": {
         "type": "object",
         "properties": {
-            "pid": {
-                "type": "integer",
-                "description": "The process id to attach to"
-            },
-            "language": {
-                "type": "string",
-                "enum": ["java", "node", "python", "ruby"],
-                "description": "The language to trace"
-            },
-            "verbose": {
+            "all": {
                 "type": "boolean",
-                "description": "Verbose mode: print the BPF program (for debugging purposes)"
+                "description": "Print all information"
             },
-            "milliseconds": {
+            ...
+            "hardware-platform": {
                 "type": "boolean",
-                "description": "Report times in milliseconds (default is microseconds)"
+                "description": "Print the hardware platform (non-portable)"
             },
-            "minimum": {
-                "type": "integer",
-                "description": "Display only GCs longer than this many milliseconds"
-            },
-            "filter": {
-                "type": "string",
-                "description": "Display only GCs whose description contains this text"
+            "operating-system": {
+                "type": "boolean",
+                "description": "Print the operating system"
             }
         },
-        "required": ["pid"]
+        "required": []
     }
-}]
+}
 ```
+This will generate a `ugc-gpt.sh` file, and then you can use the ugc command in a much easier way, like the following:
+```console
+$bash ./uname-gpt.sh print the kernel information
+Run: uname --kernel-name  --kernel-release  --kernel-version 
+Linux 5.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023
+```
+
+You can find the specifics of `uname-gpt.sh` in `examples/` of this project.

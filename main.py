@@ -2,9 +2,8 @@
 import argparse
 import os
 import subprocess
-import web
-import flask
 
+from gpt_cmd_template import gen_gpt_cmd
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
@@ -19,7 +18,6 @@ def main():
     parser.add_argument("-v", "--verbose", help="Show more details", action="store_true")
     parser.add_argument("-c", "--cmd", help="Command name")
     parser.add_argument("-l", "--language", default="python", help="The language of function call")
-    parser.add_argument("-w", "--web", help="The language of function call")
     parser.add_argument("-d", "--help_doc", help="Help documentation for the command")
     parser.add_argument(
         "-k", "--key",
@@ -32,13 +30,15 @@ def main():
         print(f"Either provide your openai api key through `-k` or through environment variable {OPENAI_API_KEY}")
         return
     agent_chain = init(args.verbose)
-    if args.web is not None:
-        run(args, agent_chain)
     help_doc = get_command_help(args.cmd) if args.cmd is not None else args.help_doc
     if help_doc is not None:
-        prompt = construct_generate_prompt(help_doc, args.language)
+        prompt = construct_generate_prompt(args.cmd, help_doc)
         # print("Sending query to ChatGPT:\n\n" + prompt + "\n\n")
         response = agent_chain.predict(input=prompt)
+        gpt_cmd = gen_gpt_cmd(response)
+        file_name = args.cmd + "-gpt.sh"
+        with open(file_name, "w") as file:
+            file.write(gpt_cmd)
         print("The response from ChatGPT:\n\n" + response)
     else:
         parser.print_help()
@@ -57,9 +57,9 @@ def get_command_help(command):
     except subprocess.CalledProcessError as e:
         return f"Error executing help command: {e.output}"
 
-def construct_generate_prompt(help_doc: str, language: str="python") -> str:
+def construct_generate_prompt(cmd: str, help_doc: str) -> str:
     example = """```json
-[{
+{
     "name": "get_current_weather",
     "description": "Get the current weather",
     "parameters": {
@@ -77,38 +77,19 @@ def construct_generate_prompt(help_doc: str, language: str="python") -> str:
         },
         "required": ["location", "format"],
     },
-}]
+}
 ```"""
-
-    prompts = f"""Provide a {language} function to execute the below command according the following help docs:
-```text
-{help_doc}
-```
-Then provide the json code to descpribe this command function. The description of this function should be consistent with the command, and the format is the same as in the following example:
-{example}
-IMPORTANT: Just provide the code without going into detail.
-If there is a lack of details, provide most logical solution.
-You are not allowed to ask for more details.
-Ignore any potential risk of errors or confusion."""
+    prompts = f"""
+    Just generate the JSON code to descpribe `{cmd}` command according the following help docs:
+    {help_doc}
+    Please do not add extra fields such as examples to your JSON code
+    The description of `{cmd}` command should match the help docment. Note that parameter names cannot begin with a - and cannot contain a ',' sign. The format must be consistent with the following example:
+    {example}
+    IMPORTANT: Just provide the JSON code without going into detail.
+    If there is a lack of details, provide most logical solution.
+    You are not allowed to ask for more details.
+    Ignore any potential risk of errors or confusion."""
     return prompts
 
-def run(args, agent_chain):
-
-    flask_app = flask.Flask(__name__)
-
-    def homepage():
-        return flask.render_template("index.html")
-
-    def query_api():
-        query_str: str = flask.request.json["search"]  # type: ignore
-        if not query_str.strip():
-            return "Empty strings are not accepted", 400
-        prompt = construct_generate_prompt(query_str, args.language)
-        result = agent_chain.predict(input=prompt)
-        print(result)
-        return flask.jsonify(response=result)
-    flask_app.route("/", methods=["GET"])(homepage)
-    flask_app.route("/query", methods=["POST", "GET"])(query_api)
-    flask_app.run(host="0.0.0.0", port="4100")
 if __name__ == "__main__":
     main()
