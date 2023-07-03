@@ -3,7 +3,7 @@ import argparse
 import os
 import subprocess
 
-from gpt_cmd_template import gen_gpt_cmd
+from script_template import gen_bash_code, gen_python_code
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
@@ -35,7 +35,10 @@ def main():
         prompt = construct_generate_prompt(args.cmd, help_doc)
         # print("Sending query to ChatGPT:\n\n" + prompt + "\n\n")
         response = agent_chain.predict(input=prompt)
-        gpt_cmd = gen_gpt_cmd(response)
+        if args.language == "python":
+            gpt_cmd = gen_python_code(response)
+        else:
+            gpt_cmd = gen_bash_code(response)
         file_name = args.cmd + "-gpt.sh"
         with open(file_name, "w") as file:
             file.write(gpt_cmd)
