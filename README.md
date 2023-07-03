@@ -1,7 +1,3 @@
-# GPT Func Call for Command-line
-Sure, here is a simplified and more appealing GitHub repo README for your project:
-
----
 # GPT Func Call generator for Command-line
 
 ** Your one-click solution to transform traditional command-line tools into natural language-driven powerhouses! **
