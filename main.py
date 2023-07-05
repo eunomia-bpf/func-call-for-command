@@ -37,9 +37,10 @@ def main():
         response = agent_chain.predict(input=prompt)
         if args.language == "python":
             gpt_cmd = gen_python_code(response)
+            file_name = args.cmd + "-gpt.py"
         else:
             gpt_cmd = gen_bash_code(response)
-        file_name = args.cmd + "-gpt.sh"
+            file_name = args.cmd + "-gpt.sh"
         with open(file_name, "w") as file:
             file.write(gpt_cmd)
         print("The response from ChatGPT:\n\n" + response)
@@ -88,6 +89,7 @@ def construct_generate_prompt(cmd: str, help_doc: str) -> str:
     Please do not add extra fields such as examples to your JSON code
     The description of `{cmd}` command should match the help docment. Note that parameter names cannot begin with a - and cannot contain a ',' sign. The format must be consistent with the following example:
     {example}
+    Please judge the type of each parameter reasonably, the properties type can be {"string", "boolean", "integer", "float"}.
     IMPORTANT: Just provide the JSON code without going into detail.
     If there is a lack of details, provide most logical solution.
     You are not allowed to ask for more details.

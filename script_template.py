@@ -37,9 +37,11 @@ def gen_python_code(func_descript):
 import subprocess
 import openai
 import json
+import sys
+user_input = " ".join(sys.argv[1:])
 
 # Send the conversation and available functions to GPT
-messages = [{"role": "user", "content": "print the kernel information"}]
+messages = [{"role": "user", "content": user_input}]
 functions = ["""
     post_content = """]
 response = openai.ChatCompletion.create(
